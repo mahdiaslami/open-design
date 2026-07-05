@@ -26,12 +26,6 @@ on:
     tags: ['v*.*.*']
 
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Git tag to build (e.g. v1.2.3)"
-        required: true
-        type: string
-
 
 jobs:
   build-and-push:
@@ -44,7 +38,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref || github.event.inputs.tag || github.sha }}
+          ref: ${{ inputs.ref || github.sha }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -75,8 +69,6 @@ jobs:
             type=raw,value=${{ inputs.release_version }},enable=${{ inputs.release_version != '' }}
             type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
             type=raw,value=latest,enable=${{ inputs.publish_latest == true }}
-            type=raw,value=${{ github.event.inputs.tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
-            type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
